@@ -2,6 +2,7 @@ import 'package:doryhome/data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class VerificationRequest extends StatefulWidget {
   VerificationRequest({Key? key}) : super(key: key);
@@ -20,13 +21,6 @@ class _VerificationRequestState extends State<VerificationRequest> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.grey),
-        title: const Text(
-          "Become Verfied",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         centerTitle: true,
       ),
       body: _loading == false
@@ -34,6 +28,17 @@ class _VerificationRequestState extends State<VerificationRequest> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      "Please Write Down The Reason For You To Post Listing in Doryhome",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
                 Container(
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
@@ -45,13 +50,18 @@ class _VerificationRequestState extends State<VerificationRequest> {
                     maxLines: 5,
                     controller: _controller,
                     decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: const BorderSide(
+                            color: Colors.grey,
+                          )),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                           borderSide: const BorderSide(
                             color: Colors.grey,
                           )),
                       hintText:
-                          "Please summarize the reason for you verfication request",
+                          "Eg: I am an owner of a hostel / Rented apartment ",
                     ),
                   ),
                 ),
@@ -67,8 +77,26 @@ class _VerificationRequestState extends State<VerificationRequest> {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.redAccent.shade400),
                           ),
-                          content: const Text(
-                            "by pressing send, you are agreeing to be contacted through mail or/and phone number. \n and also agreeing to be charged for the verfication fees in case of acceptance",
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                "by pressing send, you are agreeing to be contacted through mail or/and phone number. \n and also agreeing to our terms and fees in case of acceptance. \n",
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                              InkWell(
+                                  onTap: () {
+                                    launchUrlString(
+                                        "https://devlads.net/?page_id=3");
+                                  },
+                                  child: const Text(
+                                    "terms and conditions",
+                                    style: TextStyle(
+                                        color: Colors.black54,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 12),
+                                  )),
+                            ],
                           ),
                           actionsAlignment: MainAxisAlignment.spaceEvenly,
                           actions: [
@@ -76,10 +104,13 @@ class _VerificationRequestState extends State<VerificationRequest> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              child: Text(
-                                "Cancel",
-                                style:
-                                    TextStyle(color: Colors.redAccent.shade400),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      color: Colors.redAccent.shade400),
+                                ),
                               ),
                             ),
                             InkWell(
@@ -121,11 +152,14 @@ class _VerificationRequestState extends State<VerificationRequest> {
                                   });
                                 }
                               },
-                              child: const Text(
-                                "Send",
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold,
+                              child: const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Send",
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
@@ -135,17 +169,20 @@ class _VerificationRequestState extends State<VerificationRequest> {
                     );
                   },
                   child: Container(
-                    alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(7.5),
                         color: Colors.redAccent.shade400),
                     margin: const EdgeInsets.all(8.0),
                     padding: const EdgeInsets.all(8.0),
-                    child: const Text(
-                      "Send Request",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        "Send Request",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

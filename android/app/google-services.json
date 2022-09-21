@@ -1,36 +1,20 @@
 {
   "project_info": {
-    "project_number": "327471060536",
-    "project_id": "doryhome-3d355",
-    "storage_bucket": "doryhome-3d355.appspot.com"
+    "project_number": "1029385485249",
+    "project_id": "doryhome-541a9",
+    "storage_bucket": "doryhome-541a9.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:327471060536:android:890d2ce7c6b77c788178cd",
+        "mobilesdk_app_id": "1:1029385485249:android:3386ac26b017e4b271cd40",
         "android_client_info": {
           "package_name": "com.shahrah.doryhome"
         }
       },
       "oauth_client": [
         {
-          "client_id": "327471060536-aib9g0lf8ibor2cnh3v7s0qgaols27o9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.shahrah.doryhome",
-            "certificate_hash": "bdc68be35cf0aa0e334dbf00270bf2a3c6beb478"
-          }
-        },
-        {
-          "client_id": "327471060536-b9cr3fld0pb9traea573d96stiebtv6d.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.shahrah.doryhome",
-            "certificate_hash": "ae819666caec6d9fc3ef875615fe502350b4ce21"
-          }
-        },
-        {
-          "client_id": "327471060536-e8irvjf8e5ih4cmj6cu81siip6h32t93.apps.googleusercontent.com",
+          "client_id": "1029385485249-fqb78def82g6u538923ruu3e9d59gt0f.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.shahrah.doryhome",
@@ -38,28 +22,28 @@
           }
         },
         {
-          "client_id": "327471060536-qjh716dov6ffaebtrlf08c0id9lea22o.apps.googleusercontent.com",
+          "client_id": "1029385485249-r88t3filgq642mnn79bpcebve9rjiqbg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.shahrah.doryhome",
-            "certificate_hash": "7ee0d140986c1826e57007a2d57c60470794cb72"
+            "certificate_hash": "ae819666caec6d9fc3ef875615fe502350b4ce21"
           }
         },
         {
-          "client_id": "327471060536-0f5ne34250l2rulcl16ku1uilgfb72q0.apps.googleusercontent.com",
+          "client_id": "1029385485249-5lsqsaflklsh7na31emaa0rm31kpe5qg.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBFIMFB_C4C3DfIzo7_VbbOLSsyJvEDQP4"
+          "current_key": "AIzaSyCpWIABPik-uCSRUv9GLe1XDWEcs3ii7jc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "327471060536-0f5ne34250l2rulcl16ku1uilgfb72q0.apps.googleusercontent.com",
+              "client_id": "1029385485249-5lsqsaflklsh7na31emaa0rm31kpe5qg.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

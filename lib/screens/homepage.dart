@@ -10,6 +10,8 @@ import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage();
@@ -29,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return AdvancedDrawer(
-      backdropColor: Colors.red.shade800,
+      backdropColor: Theme.of(context).scaffoldBackgroundColor,
       controller: _advancedDrawerController,
       animationCurve: Curves.easeInOut,
       animationDuration: const Duration(milliseconds: 300),
@@ -38,24 +40,18 @@ class _MyHomePageState extends State<MyHomePage> {
       // openScale: 1.0,
       disabledGestures: false,
       childDecoration: const BoxDecoration(
-        // NOTICE: Uncomment if you want to add shadow behind the page.
-        // Keep in mind that it may cause animation jerks.
-        // boxShadow: <BoxShadow>[
-        //   BoxShadow(
-        //     color: Colors.black12,
-        //     blurRadius: 0.0,
-        //   ),
-        // ],
         borderRadius: const BorderRadius.all(Radius.circular(16)),
       ),
       drawer: Drawer(
-        backgroundColor: Colors.red.shade800,
+        backgroundColor: Colors.redAccent.shade400,
         child: StreamBuilder<DocumentSnapshot>(
             stream:
                 users.doc(FirebaseAuth.instance.currentUser!.uid).snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return const CircularProgressIndicator();
+                return const LinearProgressIndicator(
+                  color: Colors.white,
+                );
               } else {
                 return ListView(
                   children: [
@@ -63,17 +59,23 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Container(
                         child: Column(
                           children: [
-                            CachedNetworkImage(
-                              imageUrl: snapshot.data!.get('image'),
+                            CircleAvatar(
+                              radius: 45,
+                              backgroundImage: NetworkImage(
+                                snapshot.data!.get('image'),
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
                             Text(
-                              snapshot.data!.get('username'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
+                              snapshot.data!
+                                  .get('username')
+                                  .toString()
+                                  .toUpperCase(),
+                              style: GoogleFonts.aBeeZee(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             )
                           ],
                         ),
@@ -106,13 +108,30 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       },
                       leading: const Icon(
-                        Icons.verified_user,
+                        Icons.location_history,
                         color: Colors.white,
                       ),
-                      title: const Text("Become Verified User",
-                          style: TextStyle(
-                            color: Colors.white,
-                          )),
+                      title: const Text(
+                        "Publish A Listing",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height / 2,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: InkWell(
+                          onTap: () {
+                            launchUrlString("https://devlads.net");
+                          },
+                          child: Text(
+                            "Product by Devlads",
+                            style: GoogleFonts.laila(color: Colors.white),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 );
@@ -141,21 +160,24 @@ class _MyHomePageState extends State<MyHomePage> {
               items: [
                 /// Home
                 DotNavigationBarItem(
-                  icon: Icon(Icons.home),
+                  icon: const Icon(Icons.home),
                   selectedColor: Colors.white,
                   unselectedColor: Colors.white,
                 ),
 
-                /// Add Box
+                /// Add New Listing
                 DotNavigationBarItem(
-                  icon: Icon(Icons.add_box),
+                  icon: const Icon(
+                    Icons.add_box,
+                    color: Colors.white,
+                  ),
                   selectedColor: Colors.white,
                   unselectedColor: Colors.white,
                 ),
 
                 /// Profile
                 DotNavigationBarItem(
-                  icon: Icon(Icons.person),
+                  icon: const Icon(Icons.person),
                   selectedColor: Colors.white,
                   unselectedColor: Colors.white,
                 ),

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doryhome/data.dart';
 import 'package:doryhome/partition%20screens/signle_hostel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:lottie/lottie.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/intl.dart';
@@ -44,8 +45,8 @@ class _ShowHostelState extends State<ShowHostel> {
                         boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
-                            blurRadius: 10,
-                            spreadRadius: 3.6,
+                            blurRadius: 1,
+                            spreadRadius: 0.01,
                           ),
                         ],
                         color: Colors.white,
@@ -56,7 +57,6 @@ class _ShowHostelState extends State<ShowHostel> {
                           Container(
                             alignment: Alignment.center,
                             padding: const EdgeInsets.all(7.5),
-                            height: 50,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
@@ -64,57 +64,54 @@ class _ShowHostelState extends State<ShowHostel> {
                                 topRight: Radius.circular(15),
                               ),
                             ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                e.get('gender') == "male"
-                                    ? const Icon(
-                                        Icons.man,
-                                        color: Colors.blue,
-                                      )
-                                    : e.get("gender") == "female"
-                                        ? const Icon(
-                                            Icons.woman,
-                                            color: Colors.pink,
-                                          )
-                                        : const Icon(
-                                            Icons.wc_rounded,
-                                            color: Colors.green,
-                                          ),
-                                const SizedBox(
-                                  width: 15,
-                                ),
-                                Text(
-                                  e.get('room_type'),
-                                  textAlign: TextAlign.center,
+                            child: ListTile(
+                              leading: e.get('gender') == "male"
+                                  ? const Icon(
+                                      Icons.man,
+                                      color: Colors.blue,
+                                      size: 30,
+                                    )
+                                  : e.get("gender") == "female"
+                                      ? const Icon(
+                                          Icons.woman,
+                                          color: Colors.pink,
+                                        )
+                                      : const Icon(
+                                          Icons.wc_rounded,
+                                          color: Colors.green,
+                                        ),
+                              title: Text(
+                                e.get('room_type'),
+                                //textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Container(
+                                padding: const EdgeInsets.only(
+                                    top: 8.0, bottom: 8.0),
+                                child: Text(
+                                  e.get('rent') +
+                                      e.get('currency') +
+                                      " / Month",
+                                  //  textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(
-                                  width: 15,
-                                ),
-                                Text(
-                                  e.get('rent') + e.get('currency'),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(
-                                  width: 25,
-                                ),
-                                Text(
-                                  timeago
-                                      .format(e.get('createdAt').toDate())
-                                      .toString(),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w300,
+                                    fontWeight: FontWeight.w400,
                                     fontStyle: FontStyle.italic,
+                                    color: Colors.black54,
                                   ),
                                 ),
-                              ],
+                              ),
+                              trailing: Text(
+                                timeago
+                                    .format(e.get('createdAt').toDate())
+                                    .toString(),
+                                //textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w300,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             ),
                           ),
                           const Divider(
@@ -122,28 +119,43 @@ class _ShowHostelState extends State<ShowHostel> {
                             endIndent: 0,
                             color: Colors.black26,
                           ),
-                          Container(
-                            decoration:
-                                const BoxDecoration(color: Colors.white),
-                            width: MediaQuery.of(context).size.width,
-                            padding: const EdgeInsets.all(7.5),
-                            child: CachedNetworkImage(
-                              imageUrl: e.get('images')[0],
+                          FlutterCarousel(
+                            options: CarouselOptions(
+                              height: 400.0,
+                              showIndicator: true,
+                              slideIndicator: const CircularSlideIndicator(),
                             ),
+                            items: [
+                              ...e.get('images').map((s) => CachedNetworkImage(
+                                    imageUrl: s,
+                                    fit: BoxFit.cover,
+                                  ))
+                            ],
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Wrap(
                               children: [
-                                const Icon(
-                                  Icons.room,
-                                  color: Colors.red,
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.only(top: 8.0, bottom: 8.0),
+                                  child: Icon(
+                                    Icons.room,
+                                    size: 12,
+                                    color: Colors.black54,
+                                  ),
                                 ),
-                                Text(
-                                  e.get('state') + " , " + e.get("city"),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 8.0, bottom: 8.0),
+                                  child: Text(
+                                    e.get('state') + " , " + e.get("city"),
+                                    style: const TextStyle(
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 12),
+                                  ),
                                 ),
                                 const SizedBox(
                                   width: 10,
@@ -173,50 +185,43 @@ class _ShowHostelState extends State<ShowHostel> {
                             indent: 0,
                           ),
                           Container(
-                            padding: const EdgeInsets.all(7.5),
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
                             decoration: const BoxDecoration(
                               borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(15),
                                 bottomRight: Radius.circular(15),
                               ),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  e.get('additional_information').isNotEmpty
-                                      ? const Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Icon(
-                                            Icons.info,
-                                            color: Colors.amber,
-                                          ),
-                                        )
-                                      : Container(),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(
+                            child: IntrinsicHeight(
+                              child: Wrap(children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
                                     e.get('additional_information'),
                                     maxLines: 5,
                                     textAlign: TextAlign.start,
+                                    overflow: TextOverflow.visible,
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12),
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ]),
                             ),
                           ),
                           Container(
                             alignment: Alignment.center,
                             padding: const EdgeInsets.all(15),
                             decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(15),
+                                  bottomRight: Radius.circular(15)),
                               color: e.get("bills_included")
                                   ? Colors.green
-                                  : Colors.red,
+                                  : Colors.redAccent.shade400,
                             ),
                             child: e.get("bills_included")
                                 ? const Text(

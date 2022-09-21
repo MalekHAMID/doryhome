@@ -40,322 +40,287 @@ class _SingleHostelState extends State<SingleHostel> {
     return Uri.decodeFull(match.group(2)!);
   }
 
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.grey),
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-          stream: hostels.doc(widget.id).snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      margin:
-                          const EdgeInsets.only(left: 15, top: 15, right: 15),
-                      padding: const EdgeInsets.all(15),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(7.5),
-                            topRight: Radius.circular(7.5)),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          snapshot.data!.get('gender') == "male"
-                              ? const Icon(
-                                  Icons.man,
-                                  color: Colors.blue,
-                                )
-                              : snapshot.data!.get("gender") == "female"
-                                  ? const Icon(
-                                      Icons.woman,
-                                      color: Colors.pink,
-                                    )
-                                  : const Icon(
-                                      Icons.wc_rounded,
-                                      color: Colors.green,
-                                    ),
-                          const SizedBox(
-                            width: 15,
-                          ),
-                          Text(
-                            snapshot.data!.get('room_type'),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(
-                            width: 15,
-                          ),
-                          Text(
-                            snapshot.data!.get('rent') +
-                                snapshot.data!.get('currency'),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          Text(
-                            timeago
-                                .format(
-                                    snapshot.data!.get('createdAt').toDate())
-                                .toString(),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w300,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: hostels.doc(widget.id).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Scaffold(
+            body: Center(
+                child: CircularProgressIndicator(
+              color: Colors.redAccent.shade400,
+            )),
+          );
+        } else {
+          return Scaffold(
+            floatingActionButton: FutureBuilder<DocumentSnapshot>(
+              future: users.doc(snapshot.data!.get('poster')).get(),
+              builder: (context, ss) {
+                if (!ss.hasData) {
+                  return Container();
+                } else {
+                  return FloatingActionButton(
+                    backgroundColor: Colors.green,
+                    child: const Icon(
+                      Icons.whatsapp,
+                      color: Colors.white,
+                      size: 30,
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 15, right: 15),
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent.shade400,
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(
-                        left: 15,
-                        right: 15,
-                      ),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: FlutterCarousel(
-                        options: CarouselOptions(
-                          height: 400.0,
-                          showIndicator: true,
-                          slideIndicator: const CircularSlideIndicator(),
-                        ),
-                        items: [
-                          ...snapshot.data!
-                              .get('images')
-                              .map((e) => CachedNetworkImage(imageUrl: e))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 15, right: 15),
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent.shade400,
-                      ),
-                    ),
-                    snapshot.data!.get('poster') ==
+                    onPressed: () {
+                      launch(url("${ss.data!.get('phone')}", ""));
+                    },
+                  );
+                }
+              },
+            ),
+            key: _scaffoldKey,
+            appBar: AppBar(
+              backgroundColor: Colors.redAccent.shade400,
+              elevation: 1,
+              iconTheme: const IconThemeData(color: Colors.white),
+              actions: [
+                PopupMenuButton(
+                  itemBuilder: (context) => [
+                    snapshot.data!.get("poster") ==
                             FirebaseAuth.instance.currentUser!.uid
-                        ? Container(
-                            margin: const EdgeInsets.only(left: 15, right: 15),
-                            padding: const EdgeInsets.all(15),
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(15),
-                                    bottomRight: Radius.circular(15))),
-                            width: MediaQuery.of(context).size.width,
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () async {
-                                    try {
-                                      print(snapshot.data!.get('images'));
-                                      for (var image
-                                          in snapshot.data!.get('images')) {
-                                        final desertRef = storageRef
-                                            .child(getFileName(image));
+                        ? PopupMenuItem(
+                            onTap: () async {
+                              try {
+                                for (var image
+                                    in snapshot.data!.get('images')) {
+                                  final desertRef =
+                                      storageRef.child(getFileName(image));
 
-                                        await desertRef.delete();
-                                      }
-                                      await hostels
-                                          .doc(snapshot.data!.id)
-                                          .delete();
-                                      await users
-                                          .doc(FirebaseAuth
-                                              .instance.currentUser!.uid)
-                                          .collection('hostels')
-                                          .doc(snapshot.data!.id)
-                                          .delete();
-                                      Navigator.pop(context);
-                                    } catch (e) {}
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.grey,
-                                  ),
+                                  await desertRef.delete();
+                                }
+                                await hostels.doc(snapshot.data!.id).delete();
+                                await users
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .collection('hostels')
+                                    .doc(snapshot.data!.id)
+                                    .delete();
+                                Navigator.pop(context);
+                              } catch (e) {}
+                            },
+                            child: Text("Delete"),
+                          )
+                        : const PopupMenuItem(
+                            child: Text("Share"),
+                          ),
+                  ],
+                ),
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(left: 15, top: 15, right: 15),
+                    padding: const EdgeInsets.all(15),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(7.5),
+                          topRight: Radius.circular(7.5)),
+                    ),
+                    child: ListTile(
+                      leading: snapshot.data!.get('gender') == "male"
+                          ? const Icon(
+                              Icons.man,
+                              color: Colors.blue,
+                              size: 30,
+                            )
+                          : snapshot.data!.get("gender") == "female"
+                              ? const Icon(
+                                  Icons.woman,
+                                  color: Colors.pink,
+                                )
+                              : const Icon(
+                                  Icons.wc_rounded,
+                                  color: Colors.green,
                                 ),
-                                IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Colors.grey,
-                                  ),
+                      title: Text(
+                        snapshot.data!.get('room_type'),
+                        //textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Container(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                        child: Text(
+                          snapshot.data!.get('rent') +
+                              snapshot.data!.get('currency') +
+                              " / Month",
+                          //  textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ),
+                      trailing: Text(
+                        timeago
+                            .format(snapshot.data!.get('createdAt').toDate())
+                            .toString(),
+                        //textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w300,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(
+                      left: 15,
+                      right: 15,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: const Divider(
+                      color: Colors.black38,
+                      indent: 50,
+                      endIndent: 50,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(
+                      left: 15,
+                      right: 15,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: FlutterCarousel(
+                      options: CarouselOptions(
+                        height: 400.0,
+                        showIndicator: true,
+                        slideIndicator: const CircularSlideIndicator(),
+                      ),
+                      items: [
+                        ...snapshot.data!
+                            .get('images')
+                            .map((e) => CachedNetworkImage(imageUrl: e))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 15, right: 15),
+                    child: ListTile(
+                      tileColor: snapshot.data!.get('bills_included')
+                          ? Colors.green
+                          : Colors.redAccent.shade400,
+                      title: snapshot.data!.get('bills_included')
+                          ? const Text(
+                              "Bills are included",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          : const Text("Bills are not included",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  FutureBuilder<List<Location>>(
+                      future: locationFromAddress(snapshot.data!.get('state') +
+                          " , " +
+                          snapshot.data!.get('city') +
+                          " , " +
+                          snapshot.data!.get('address')['mah']),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Container();
+                        } else {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: const EdgeInsets.only(
+                              left: 15,
+                              right: 15,
+                            ),
+                            height: MediaQuery.of(context).size.height / 3,
+                            child: FlutterMap(
+                              options: MapOptions(
+                                allowPanning: false,
+                                allowPanningOnScrollingParent: false,
+                                center: LatLng(snapshot.data!.first.latitude,
+                                    snapshot.data!.first.longitude),
+                                zoom: 12.5,
+                              ),
+                              layers: [
+                                TileLayerOptions(
+                                  urlTemplate:
+                                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  subdomains: ['a', 'b', 'c'],
+                                  userAgentPackageName:
+                                      'dev.fleaflet.flutter_map.example',
+                                ),
+                                MarkerLayerOptions(
+                                  markers: [
+                                    Marker(
+                                      point: LatLng(
+                                          snapshot.data!.first.latitude,
+                                          snapshot.data!.first.longitude),
+                                      width: 100,
+                                      height: 100,
+                                      builder: (context) => Icon(
+                                        Icons.circle,
+                                        size: 250,
+                                        color: Colors.redAccent.shade400
+                                            .withOpacity(0.5),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          )
-                        : Container(),
-                    Container(
-                      margin: const EdgeInsets.only(left: 15, right: 15),
-                      child: ListTile(
-                        tileColor: snapshot.data!.get('bills_included')
-                            ? Colors.green
-                            : Colors.red,
-                        title: snapshot.data!.get('bills_included')
-                            ? const Text(
-                                "Bills are included",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            : const Text("Bills are not included",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
+                          );
+                        }
+                      }),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    margin:
+                        const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+                    padding:
+                        const EdgeInsets.only(top: 15, bottom: 15, left: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.shade400,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(15),
+                        bottomRight: Radius.circular(15),
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 15, right: 15),
-                      padding: const EdgeInsets.all(15),
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(15),
-                              bottomRight: Radius.circular(15))),
-                      child: FutureBuilder<DocumentSnapshot>(
-                        future: users.doc(snapshot.data!.get('poster')).get(),
-                        builder: (context, dataa) {
-                          if (!dataa.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else {
-                            return ListTile(
-                              leading: dataa.data!.get('verified_user')
-                                  ? const Icon(
-                                      Icons.verified,
-                                      color: Colors.blue,
-                                    )
-                                  : Container(),
-                              title: Text(
-                                dataa.data!.get('username'),
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14),
-                              ),
-                              trailing: IconButton(
-                                onPressed: () {
-                                  launch(url(dataa.data!.get('phone'), " "));
-                                },
-                                icon: const Icon(
-                                  Icons.whatsapp_rounded,
-                                  color: Colors.green,
-                                  size: 45,
-                                ),
-                              ),
-                              subtitle: Text(
-                                  snapshot.data!.get('additional_information')),
-                            );
-                          }
-                        },
-                      ),
+                    child: Text(
+                      snapshot.data!.get('state') +
+                          " , " +
+                          snapshot.data!.get('city') +
+                          " , " +
+                          snapshot.data!.get('address')['mah'] +
+                          " " +
+                          snapshot.data!.get('address')['no'] +
+                          " " +
+                          snapshot.data!.get('address')['apt'],
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.white.withOpacity(0.8)),
                     ),
-                    FutureBuilder<List<Location>>(
-                        future: locationFromAddress(
-                            snapshot.data!.get('state') +
-                                " , " +
-                                snapshot.data!.get('city') +
-                                " , " +
-                                snapshot.data!.get('address')['mah']),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Container();
-                          } else {
-                            return Container(
-                              margin: const EdgeInsets.only(
-                                left: 15,
-                                right: 15,
-                              ),
-                              height: MediaQuery.of(context).size.height / 3,
-                              child: FlutterMap(
-                                options: MapOptions(
-                                  allowPanningOnScrollingParent: false,
-                                  center: LatLng(snapshot.data!.first.latitude,
-                                      snapshot.data!.first.longitude),
-                                  zoom: 12,
-                                ),
-                                layers: [
-                                  TileLayerOptions(
-                                    urlTemplate:
-                                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                    subdomains: ['a', 'b', 'c'],
-                                    userAgentPackageName:
-                                        'dev.fleaflet.flutter_map.example',
-                                  ),
-                                  MarkerLayerOptions(
-                                    markers: [
-                                      Marker(
-                                        point: LatLng(
-                                            snapshot.data!.first.latitude,
-                                            snapshot.data!.first.longitude),
-                                        width: 80,
-                                        height: 80,
-                                        builder: (context) => Icon(
-                                          Icons.circle,
-                                          color: Colors.redAccent.shade400
-                                              .withOpacity(0.5),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }),
-                    Container(
-                      margin: const EdgeInsets.only(
-                          left: 15, right: 15, bottom: 15),
-                      padding: const EdgeInsets.all(15),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(15),
-                          bottomRight: Radius.circular(15),
-                        ),
-                      ),
-                      child: Text(
-                        snapshot.data!.get('state') +
-                            " , " +
-                            snapshot.data!.get('city') +
-                            " , " +
-                            snapshot.data!.get('address')['mah'] +
-                            " " +
-                            snapshot.data!.get('address')['no'] +
-                            " " +
-                            snapshot.data!.get('address')['apt'],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-          }),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }
